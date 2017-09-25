@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp" />
+
+    <Button
+        android:id="@+id/btVerify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="检查更新" />
+
+    <Button
+        android:id="@+id/btDownload"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="下载更新" />
+
+    <Button
+        android:id="@+id/btCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="取消" />
+
+</LinearLayout>
