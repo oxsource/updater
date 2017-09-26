@@ -2,12 +2,14 @@ package oxsource.android.updater.demo;
 
 import org.json.JSONObject;
 
+import oxsource.android.updater.arch.UpdateVersion;
+
 /**
  * APK版本信息
  * Created by peng on 2017/9/25.
  */
 
-public class ApkVersion {
+public class ApkVersion implements UpdateVersion {
     private String name;//APP名称
     private int versionCode;//版本号
     private String versionName;//版本名称
@@ -15,48 +17,69 @@ public class ApkVersion {
     private String downloadPath;//文件远程下载地址
     private boolean force;//强制升级
 
+    @Override
     public String name() {
         return name;
+    }
+
+    @Override
+    public int versionCode() {
+        return versionCode;
+    }
+
+    @Override
+    public String versionName() {
+        return versionName;
+    }
+
+    @Override
+    public String fileSize() {
+        return "8.4M";
+    }
+
+    @Override
+    public String fileMd5() {
+        return "0CA175B9C0F726A831D895E269332461";
+    }
+
+    @Override
+    public String filePath() {
+        return downloadPath;
+    }
+
+    @Override
+    public String publishTime() {
+        return "2017-09-26 18:45:21";
+    }
+
+    @Override
+    public String updateDesc() {
+        return updateDesc;
+    }
+
+    @Override
+    public boolean force() {
+        return force;
     }
 
     public void name(String name) {
         this.name = name;
     }
 
-    public int versionCode() {
-        return versionCode;
-    }
-
     public void versionCode(int versionCode) {
         this.versionCode = versionCode;
-    }
-
-    public String versionName() {
-        return versionName;
     }
 
     public void versionName(String versionName) {
         this.versionName = versionName;
     }
 
-    public String updateDesc() {
-        return updateDesc;
-    }
-
     public void updateDesc(String updateDesc) {
         this.updateDesc = updateDesc;
     }
 
-    public String downloadPath() {
-        return downloadPath;
-    }
-
     public void downloadPath(String downloadPath) {
         this.downloadPath = downloadPath;
-    }
-
-    public boolean force() {
-        return force;
     }
 
     public void force(boolean force) {

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="UpdateDialogPaddingChild">
+        <item name="android:paddingLeft">@dimen/common_activity_margin</item>
+        <item name="android:paddingRight">@dimen/common_activity_margin</item>
+        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="UpdateBottomButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@color/transport</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+</resources>

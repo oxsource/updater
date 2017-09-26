@@ -17,12 +17,6 @@
         android:text="检查更新" />
 
     <Button
-        android:id="@+id/btDownload"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="下载更新" />
-
-    <Button
         android:id="@+id/btCancel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

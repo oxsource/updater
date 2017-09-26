@@ -1,4 +1,4 @@
-package oxsource.android.updater;
+package oxsource.android.updater.arch;
 
 import android.app.Application;
 import android.content.Intent;
@@ -17,13 +17,14 @@ import java.net.URL;
 
 import oxsource.android.updater.listener.DownloadListener;
 import oxsource.android.updater.listener.UpdateValidator;
+import oxsource.android.updater.view.UpdateNotification;
 
 /**
- * 更新处理器
+ * 更新控制器
  * Created by peng on 2017/9/23.
  */
 
-public final class UpdatePower implements Handler.Callback {
+public final class UpdateController implements Handler.Callback {
     //整型常量
     private final int WHAT_VERIFY_START = 10;
     private final int WHAT_VERIFY_SUCCESS = 11;
@@ -46,15 +47,26 @@ public final class UpdatePower implements Handler.Callback {
     private final int TIME_INTERVAL_MS = 500;
     //监听回调
     private final Handler handler = new Handler(this);
-    public static UpdateValidator validator;
-    public static DownloadListener dListener;
-    private NotificationPower notificationPower;
+    private UpdateValidator validator;
+    private DownloadListener dListener;
+    private UpdateNotification notification;
 
-    UpdatePower(NotificationPower notificationPower) {
-        this.notificationPower = notificationPower;
+    public void validator(UpdateValidator validator) {
+        this.validator = validator;
     }
 
-    public void verify(String verifyUrl) {
+    public void downloadListener(DownloadListener dListener) {
+        this.dListener = dListener;
+    }
+
+    public void notification(UpdateNotification ntf) {
+        if (null != notification) {
+            notification.cancel();
+        }
+        notification = ntf;
+    }
+
+    public void verify(final String verifyUrl) {
         HttpURLConnection conn = null;
         BufferedInputStream bis = null;
         try {
@@ -78,7 +90,7 @@ public final class UpdatePower implements Handler.Callback {
             bos.flush();
             byte[] arrays = bos.toByteArray();
             bos.reset();
-            Object value = validator.onVerify(new String(arrays, CHARSET_DEFAULT));
+            UpdateVersion value = validator.onVerify(new String(arrays, CHARSET_DEFAULT));
             notifyHandler(WHAT_VERIFY_SUCCESS, value);
         } catch (Exception e) {
             String error = null == e ? ERROR_DEFAULT_VALIDATE : e.getMessage();
@@ -213,7 +225,7 @@ public final class UpdatePower implements Handler.Callback {
                 validator.onFailure(-1, (String) message.obj);
                 break;
             case WHAT_VERIFY_SUCCESS:
-                validator.onSuccess(message.obj);
+                validator.onSuccess((UpdateVersion) message.obj);
                 break;
             default:
                 finish = false;
@@ -232,63 +244,35 @@ public final class UpdatePower implements Handler.Callback {
             case WHAT_DOWNLOAD_PROGRESS:
                 int[] position = (int[]) message.obj;
                 dListener.onProgress(position[1], position[0]);
-                notificationPower.onProgress(position[1], position[0]);
+                if (null != notification) {
+                    notification.onProgress(position[1], position[0]);
+                }
                 break;
             case WHAT_DOWNLOAD_START:
                 dListener.onStart();
-                notificationPower.onStart();
+                if (null != notification) {
+                    notification.onStart();
+                }
                 break;
             case WHAT_DOWNLOAD_FAILURE:
                 String error = (String) message.obj;
                 dListener.onFailure(-1, error);
-                notificationPower.onFailure(-1, error);
+                if (null != notification) {
+                    notification.onFailure(-1, error);
+                }
                 break;
             case WHAT_DOWNLOAD_SUCCESS:
                 String path = (String) message.obj;
                 dListener.onSuccess(path);
-                notificationPower.onSuccess(path);
+                if (null != notification) {
+                    notification.onSuccess(path);
+                }
                 break;
             default:
                 finish = false;
                 break;
         }
         return finish;
-    }
-
-    //校验Runnable
-    static class VerifyRunnable implements Runnable {
-        private final String verifyUrl;
-        private final UpdatePower handler;
-
-        public VerifyRunnable(UpdatePower handler, String verifyUrl) {
-            this.handler = handler;
-            this.verifyUrl = verifyUrl;
-        }
-
-        @Override
-        public void run() {
-            if (null != handler) {
-                handler.verify(verifyUrl);
-            }
-        }
-    }
-
-    //下载Runnable
-    static class DownloadRunnable implements Runnable {
-        private final UpdatePower handler;
-        private final String apkUrl;
-
-        public DownloadRunnable(UpdatePower handler, String apkUrl) {
-            this.apkUrl = apkUrl;
-            this.handler = handler;
-        }
-
-        @Override
-        public void run() {
-            if (null != handler) {
-                handler.download(apkUrl);
-            }
-        }
     }
 
     private File downloadFile() throws Exception {

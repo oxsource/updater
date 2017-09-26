@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="32dp"
+    android:background="@drawable/update_dialog_bkg"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvName"
+        style="@style/UpdateDialogPaddingChild"
+        android:layout_height="@dimen/common_title_height"
+        android:gravity="center_vertical"
+        android:text="快车智网承运2.0.0"
+        android:textSize="18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/line_size_05"
+        android:background="@color/line_gray_01" />
+
+    <TextView
+        android:id="@+id/tvVersion"
+        style="@style/UpdateDialogPaddingChild"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:lineSpacingExtra="5dp"
+        android:text="版本号：2.0.0\n包大小：8.4M\n更新时间：2017-09-27 18:45:21"
+        android:textSize="14sp" />
+
+    <TextView
+        style="@style/UpdateDialogPaddingChild"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:text="更新说明："
+        android:textSize="16sp" />
+
+    <ScrollView
+        style="@style/UpdateDialogPaddingChild"
+        android:layout_height="80dp"
+        android:layout_marginTop="5dp">
+
+        <TextView
+            android:id="@+id/tvUpdateDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1、新增-备注功能及装货确认，打通运输全流程；\n2、优化-页面改版好看好用，升级新体验；\n3、优化-删除抢单和一单多车调配，更贴合实际业务需求。"
+            android:textSize="14sp" />
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/rlDownloadProgress"
+        style="@style/UpdateDialogPaddingChild"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/pbDownload"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/pbDownload"
+            android:text="正在下载..." />
+
+        <TextView
+            android:id="@+id/tvPercent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/pbDownload"
+            android:text="100%" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/line_size_05"
+        android:layout_marginTop="10dp"
+        android:background="@color/line_gray_01" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_button_height"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btLeft"
+            style="@style/UpdateBottomButton"
+            android:text="立即更新" />
+
+        <View
+            android:id="@+id/lineBtMiddle"
+            android:layout_width="@dimen/line_size_05"
+            android:layout_height="match_parent"
+            android:background="@color/line_gray_01" />
+
+        <Button
+            android:id="@+id/btRight"
+            style="@style/UpdateBottomButton"
+            android:text="下次再说" />
+    </LinearLayout>
+</LinearLayout>

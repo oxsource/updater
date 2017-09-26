@@ -1,11 +1,12 @@
-package oxsource.android.updater;
+package oxsource.android.updater.view;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
 
+import oxsource.android.updater.R;
+import oxsource.android.updater.UpdateHandle;
 import oxsource.android.updater.listener.DownloadListener;
 
 /**
@@ -13,7 +14,7 @@ import oxsource.android.updater.listener.DownloadListener;
  * Created by wangcheng on 2017/9/25.
  */
 
-public class NotificationPower implements DownloadListener {
+public class UpdateNotification implements DownloadListener {
     private final static int TYPE_CHANNEL = 99;
 
     private NotificationCompat.Builder mBuilder;
@@ -21,7 +22,7 @@ public class NotificationPower implements DownloadListener {
     private int mSmallIcon = R.drawable.ic_launcher;
     private Context context;
 
-    public NotificationPower(Context context) {
+    public UpdateNotification(Context context) {
         this.context = context;
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mBuilder = new NotificationCompat.Builder(context);
@@ -56,11 +57,16 @@ public class NotificationPower implements DownloadListener {
     public void onSuccess(String filePath) {
         mBuilder.setProgress(0, 0, false);
         mBuilder.setContentText("下载成功，点击安装");
-        Intent intent = new UpdateService.Builder()
-                .what(UpdateService.WHAT_INSTALL)
+        UpdateHandle handle = new UpdateHandle.Builder()
+                .what(UpdateHandle.WHAT_INSTALL)
                 .path(filePath)
-                .intent();
-        mBuilder.setContentIntent(PendingIntent.getService(context, 0, intent, 0));
+                .build();
+        PendingIntent intent = handle.pendingIntent(context);
+        mBuilder.setContentIntent(intent);
         mNotificationManager.notify(TYPE_CHANNEL, mBuilder.build());
+    }
+
+    public void cancel() {
+        mNotificationManager.cancel(TYPE_CHANNEL);
     }
 }

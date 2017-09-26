@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="common_title_height">54dp</dimen>
+    <dimen name="common_button_height">52dp</dimen>
+    <dimen name="common_activity_margin">15dp</dimen>
+
+    <dimen name="line_size_01">0.1dp</dimen>
+    <dimen name="line_size_05">0.5dp</dimen>
+</resources>
