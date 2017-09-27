@@ -22,7 +22,7 @@
         android:lineSpacingExtra="5dp"
         android:text="新版本号：2.0.0\n文件大小：8.4M\n更新时间：2017-09-27 18:45:21"
         android:textColor="@color/text_gray_01"
-        android:textSize="14sp" />
+        android:textSize="15sp" />
 
     <TextView
         style="@style/UpdateDialogPaddingChild"
@@ -30,7 +30,7 @@
         android:layout_marginTop="15dp"
         android:text="更新说明："
         android:textColor="@color/text_gray_01"
-        android:textSize="14sp" />
+        android:textSize="15sp" />
 
 
     <TextView
@@ -44,7 +44,7 @@
         android:scrollbars="vertical"
         android:text="部分小BUG及兼容性问题修复"
         android:textColor="@color/text_gray_01"
-        android:textSize="14sp" />
+        android:textSize="15sp" />
 
     <RelativeLayout
         android:id="@+id/rlDownloadProgress"
