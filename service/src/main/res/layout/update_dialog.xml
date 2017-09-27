@@ -11,12 +11,12 @@
         style="@style/UpdateDialogPaddingChild"
         android:layout_height="@dimen/common_title_height"
         android:gravity="center_vertical"
-        android:text="快车智网承运2.0.0"
+        android:text="快车智网承运2.0.0build234alpha"
         android:textSize="18sp" />
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/line_size_05"
+        android:layout_height="@dimen/line_size_01"
         android:background="@color/line_gray_01" />
 
     <TextView
@@ -35,18 +35,18 @@
         android:text="更新说明："
         android:textSize="16sp" />
 
-    <ScrollView
-        style="@style/UpdateDialogPaddingChild"
-        android:layout_height="80dp"
-        android:layout_marginTop="5dp">
 
-        <TextView
-            android:id="@+id/tvUpdateDesc"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="1、新增-备注功能及装货确认，打通运输全流程；\n2、优化-页面改版好看好用，升级新体验；\n3、优化-删除抢单和一单多车调配，更贴合实际业务需求。"
-            android:textSize="14sp" />
-    </ScrollView>
+    <TextView
+        android:id="@+id/tvUpdateDesc"
+        style="@style/UpdateDialogPaddingChild"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:maxHeight="60dp"
+        android:scrollbars="vertical"
+        android:text="1、新增-备注功能及装货确认，打通运输全流程；\n2、优化-页面改版好看好用，升级新体验；\n3、优化-删除抢单和一单多车调配，更贴合实际业务需求。"
+        android:textSize="14sp" />
+
 
     <RelativeLayout
         android:id="@+id/rlDownloadProgress"
@@ -79,7 +79,7 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="@dimen/line_size_05"
+        android:layout_height="@dimen/line_size_01"
         android:layout_marginTop="10dp"
         android:background="@color/line_gray_01" />
 
@@ -95,7 +95,7 @@
 
         <View
             android:id="@+id/lineBtMiddle"
-            android:layout_width="@dimen/line_size_05"
+            android:layout_width="@dimen/line_size_01"
             android:layout_height="match_parent"
             android:background="@color/line_gray_01" />
 

@@ -5,5 +5,4 @@
     <dimen name="common_activity_margin">15dp</dimen>
 
     <dimen name="line_size_01">0.1dp</dimen>
-    <dimen name="line_size_05">0.5dp</dimen>
 </resources>

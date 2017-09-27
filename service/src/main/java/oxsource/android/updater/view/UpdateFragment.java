@@ -58,6 +58,7 @@ public class UpdateFragment extends DialogFragment {
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         //
         tvName = (TextView) view.findViewById(R.id.tvName);
+        tvName.getPaint().setFakeBoldText(true);
         tvVersion = (TextView) view.findViewById(R.id.tvVersion);
         tvUpdateDesc = (TextView) view.findViewById(R.id.tvUpdateDesc);
         //
