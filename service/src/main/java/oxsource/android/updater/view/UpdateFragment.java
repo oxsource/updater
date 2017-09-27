@@ -56,17 +56,17 @@ public class UpdateFragment extends DialogFragment {
         View view = lf.inflate(R.layout.update_dialog, null, false);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         //
-        tvName = view.findViewById(R.id.tvName);
-        tvVersion = view.findViewById(R.id.tvVersion);
-        tvUpdateDesc = view.findViewById(R.id.tvUpdateDesc);
+        tvName = (TextView) view.findViewById(R.id.tvName);
+        tvVersion = (TextView) view.findViewById(R.id.tvVersion);
+        tvUpdateDesc = (TextView) view.findViewById(R.id.tvUpdateDesc);
         //
-        rlDownloadProgress = view.findViewById(R.id.rlDownloadProgress);
-        pbDownload = view.findViewById(R.id.pbDownload);
-        tvPercent = view.findViewById(R.id.tvPercent);
+        rlDownloadProgress = (RelativeLayout) view.findViewById(R.id.rlDownloadProgress);
+        pbDownload = (ProgressBar) view.findViewById(R.id.pbDownload);
+        tvPercent = (TextView) view.findViewById(R.id.tvPercent);
         //
-        btLeft = view.findViewById(R.id.btLeft);
+        btLeft = (Button) view.findViewById(R.id.btLeft);
         lineBtMiddle = view.findViewById(R.id.lineBtMiddle);
-        btRight = view.findViewById(R.id.btRight);
+        btRight = (Button) view.findViewById(R.id.btRight);
 
         initWidgets();
         return view;

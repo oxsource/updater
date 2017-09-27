@@ -28,10 +28,10 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
         updateFragment = new UpdateFragment();
 
-        tvInfo = findViewById(R.id.tvInfo);
-        btVerify = findViewById(R.id.btVerify);
+        tvInfo = (TextView) findViewById(R.id.tvInfo);
+        btVerify = (Button) findViewById(R.id.btVerify);
         btVerify.setOnClickListener(cklVerify);
-        btCancel = findViewById(R.id.btCancel);
+        btCancel = (Button) findViewById(R.id.btCancel);
         btCancel.setOnClickListener(cklCancel);
         btCancel.setVisibility(View.GONE);
         UpdatePermission.auth(this);
