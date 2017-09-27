@@ -49,6 +49,7 @@ public class UpdateFragment extends DialogFragment {
 
     private UpdateVersion apkVersion;
     private UpdateHandle updateHandle;
+    private DownloadListener outDownloadListener;//外部注册的下载监听器
 
     @Nullable
     @Override
@@ -70,6 +71,10 @@ public class UpdateFragment extends DialogFragment {
 
         initWidgets();
         return view;
+    }
+
+    public void setDownloadListener(DownloadListener listener) {
+        outDownloadListener = listener;
     }
 
     private void initWidgets() {
@@ -174,12 +179,18 @@ public class UpdateFragment extends DialogFragment {
         public void onStart() {
             setDownloadProgress(0);
             setBottomButton(STR_DOWNLOAD_CANCEL, clkCancel, "", null);
+            if (null != outDownloadListener) {
+                outDownloadListener.onStart();
+            }
         }
 
         @Override
         public void onProgress(int current, int total) {
             int progress = (int) (current / (total / 1.0) * 100);
             setDownloadProgress(progress);
+            if (null != outDownloadListener) {
+                outDownloadListener.onProgress(current, total);
+            }
         }
 
         @Override
@@ -188,6 +199,9 @@ public class UpdateFragment extends DialogFragment {
             showToast("下载出错！");
             setDownloadProgress(-1);
             setBottomButton(STR_DOWNLOAD_AGAIN, clkDownload, STR_NEXT_TIME, clkCancel);
+            if (null != outDownloadListener) {
+                outDownloadListener.onFailure(code, message);
+            }
         }
 
         @Override
@@ -200,6 +214,9 @@ public class UpdateFragment extends DialogFragment {
                     .path(filePath)
                     .build()
                     .intent(getContext());
+            if (null != outDownloadListener) {
+                outDownloadListener.onSuccess(filePath);
+            }
         }
     };
 
