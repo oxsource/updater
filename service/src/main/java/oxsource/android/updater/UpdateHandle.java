@@ -45,6 +45,15 @@ public class UpdateHandle {
         controller.downloadListener(builder.listener);
     }
 
+    private void build(Context context) {
+        String tag = controller.toString();
+        if (!controllers.containsKey(controllers)) {
+            controllers.put(tag, controller);
+            intent.putExtra(KEY_CONTROLLER_TAG, tag);
+            intent.setPackage(context.getPackageName());
+        }
+    }
+
     /**
      * 启动service并返回Intent
      *
@@ -52,18 +61,19 @@ public class UpdateHandle {
      * @return
      */
     public Intent intent(@NonNull Context context) {
-        String tag = controller.toString();
-        if (!controllers.containsKey(controllers)) {
-            controllers.put(tag, controller);
-            intent.putExtra(KEY_CONTROLLER_TAG, tag);
-            intent.setPackage(context.getPackageName());
-        }
+        build(context);
         context.startService(intent);
         return intent;
     }
 
+    /**
+     * 不启动service并返回Intent
+     *
+     * @param context
+     * @return
+     */
     public PendingIntent pendingIntent(@NonNull Context context) {
-        Intent intent = intent(context);
+        build(context);
         return PendingIntent.getService(context, 0, intent, 0);
     }
 

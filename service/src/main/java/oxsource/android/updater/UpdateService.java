@@ -36,6 +36,9 @@ public final class UpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         int result = super.onStartCommand(intent, flags, startId);
+        if (null == intent) {
+            return result;
+        }
         int what = intent.getIntExtra(UpdateHandle.KEY_WHAT, -1);
         String tag = intent.getStringExtra(UpdateHandle.KEY_CONTROLLER_TAG);
         UpdateController controller = UpdateHandle.obtain(tag);
@@ -56,6 +59,7 @@ public final class UpdateService extends Service {
             case UpdateHandle.WHAT_INSTALL:
                 log("UpdateService WHAT_INSTALL");
                 String apkPath = intent.getStringExtra(UpdateHandle.KEY_PATH);
+                controller.notification(notification);
                 controller.install(getApplication(), apkPath);
                 break;
             default:

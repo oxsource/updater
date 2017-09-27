@@ -90,9 +90,9 @@ public class UpdateFragment extends DialogFragment {
         tvUpdateDesc.setText(apkVersion.updateDesc());
         //
         if (apkVersion.force()) {
-            setBottomButton(STR_NEXT_TIME, clkCancel, STR_DOWNLOAD_NOW, clkDownload);
-        } else {
             setBottomButton(STR_DOWNLOAD_NOW, clkDownload, "", null);
+        } else {
+            setBottomButton(STR_NEXT_TIME, clkCancel, STR_DOWNLOAD_NOW, clkDownload);
         }
         //下载进度初始化
         setDownloadProgress(-1);
