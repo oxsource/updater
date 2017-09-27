@@ -9,17 +9,19 @@ import oxsource.android.updater.arch.UpdateController;
 
 public class DownloadRunnable implements Runnable {
     private UpdateController handler;
+    private String apkPath;
     private String apkUrl;
 
-    public DownloadRunnable(UpdateController handler, String apkUrl) {
-        this.apkUrl = apkUrl;
+    public DownloadRunnable(UpdateController handler, String apkPath, String apkUrl) {
         this.handler = handler;
+        this.apkPath = apkPath;
+        this.apkUrl = apkUrl;
     }
 
     @Override
     public void run() {
         if (null != handler) {
-            handler.download(apkUrl);
+            handler.download(apkPath, apkUrl);
         }
     }
 }

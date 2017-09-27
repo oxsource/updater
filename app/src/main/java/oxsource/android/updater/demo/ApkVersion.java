@@ -23,6 +23,11 @@ public class ApkVersion implements UpdateVersion {
     }
 
     @Override
+    public String englishName() {
+        return "test";
+    }
+
+    @Override
     public int versionCode() {
         return versionCode;
     }

@@ -9,8 +9,8 @@ import android.util.Log;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import oxsource.android.updater.async.DownloadRunnable;
 import oxsource.android.updater.arch.UpdateController;
+import oxsource.android.updater.async.DownloadRunnable;
 import oxsource.android.updater.async.VerifyRunnable;
 import oxsource.android.updater.view.UpdateNotification;
 
@@ -25,12 +25,14 @@ public final class UpdateService extends Service {
 
     private final Executor threadPool = Executors.newCachedThreadPool();
     private UpdateNotification notification;
+    private String downloadPath;
 
     @Override
     public void onCreate() {
         super.onCreate();
         notification = new UpdateNotification(getApplicationContext());
-        log("UpdateService onCreate");
+        downloadPath = UpdateController.downloadPath(getApplication());
+        log("UpdateService onCreate,download path=" + downloadPath);
     }
 
     @Override
@@ -49,8 +51,9 @@ public final class UpdateService extends Service {
             case UpdateHandle.WHAT_DOWNLOAD:
                 log("UpdateService WHAT_DOWNLOAD");
                 String apkUrl = intent.getStringExtra(UpdateHandle.KEY_URL);
+                String apkPah = downloadPath + intent.getStringExtra(UpdateHandle.KEY_PATH);
                 controller.notification(notification);
-                threadPool.execute(new DownloadRunnable(controller, apkUrl));
+                threadPool.execute(new DownloadRunnable(controller, apkPah, apkUrl));
                 break;
             case UpdateHandle.WHAT_INSTALL:
                 log("UpdateService WHAT_INSTALL");

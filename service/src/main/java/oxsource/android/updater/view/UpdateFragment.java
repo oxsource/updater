@@ -149,6 +149,7 @@ public class UpdateFragment extends DialogFragment {
             }
             updateHandle = new UpdateHandle.Builder()
                     .what(UpdateHandle.WHAT_DOWNLOAD)
+                    .path(apkVersion.englishName() + apkVersion.versionName())
                     .url(apkVersion.filePath())
                     .download(downloadListener)
                     .build();

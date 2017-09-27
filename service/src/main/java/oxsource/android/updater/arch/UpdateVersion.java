@@ -14,6 +14,13 @@ public interface UpdateVersion {
     String name();
 
     /**
+     * 应用名称
+     *
+     * @return
+     */
+    String englishName();
+
+    /**
      * 版本号
      *
      * @return

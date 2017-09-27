@@ -2,10 +2,13 @@ package oxsource.android.updater.arch;
 
 import android.app.Application;
 import android.content.Intent;
+import android.content.res.XmlResourceParser;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.content.FileProvider;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -15,6 +18,7 @@ import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import oxsource.android.updater.R;
 import oxsource.android.updater.listener.DownloadListener;
 import oxsource.android.updater.listener.UpdateValidator;
 import oxsource.android.updater.view.UpdateNotification;
@@ -36,13 +40,13 @@ public final class UpdateController implements Handler.Callback {
     private final int WHAT_DOWNLOAD_FAILURE = 23;
 
     //字符串常量
-    public final static String DIRECTORY_DEFAULT = "DOWNLOADS";
+    public final static String SUFFIX_APK = ".apk";
     private final static String METHOD_POST = "POST";
     private final static String KEY_CHARSET = "Charset";
     private final static String CHARSET_DEFAULT = "UTF-8";
     private final static String MIME_TYPE_APK = "application/vnd.android.package-archive";
     private final static String ERROR_DEFAULT_VALIDATE = "检查版本信息异常";
-    private final static String ERROR_DEFAULT_DOWNLOAD = "下载更新遗产异常";
+    private final static String ERROR_DEFAULT_DOWNLOAD = "下载更新异常";
     private final int TIME_OUT_MS = 5 * 1000;
     private final int TIME_INTERVAL_MS = 500;
     //监听回调
@@ -101,18 +105,23 @@ public final class UpdateController implements Handler.Callback {
         }
     }
 
-    public void download(String apkUrl) {
+    public void download(String apkPath, String apkUrl) {
         HttpURLConnection conn = null;
         BufferedInputStream bis = null;
         FileOutputStream fos = null;
         try {
             notifyHandler(WHAT_DOWNLOAD_START, null);
             //配置本地下载路径
-            int pos = apkUrl.lastIndexOf("/") + 1;
-            File apkPath = downloadFile();
-            File apkFile = new File(apkPath, apkUrl.substring(pos));
-            if (!apkPath.exists()) {
-                apkPath.mkdirs();
+            String state = Environment.getExternalStorageState();
+            if (!Environment.MEDIA_MOUNTED.equals(state)) {
+                throw new IllegalStateException("没有检测到可用的SD卡");
+            }
+            if (!apkPath.endsWith(SUFFIX_APK)) {
+                apkPath += SUFFIX_APK;
+            }
+            File apkFile = new File(Environment.getExternalStorageDirectory(), apkPath);
+            if (!apkFile.getParentFile().exists()) {
+                apkFile.getParentFile().mkdirs();
             }
             fos = new FileOutputStream(apkFile);
             //配置远程连接
@@ -153,10 +162,19 @@ public final class UpdateController implements Handler.Callback {
     }
 
     public boolean install(Application context, String path) {
+        notification(null);
         boolean value = false;
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            Uri uri = Uri.fromFile(new File(path));
+            File file = new File(path);
+            Uri uri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                String authorities = context.getString(R.string.updater_file_provider_authorities);
+                uri = FileProvider.getUriForFile(context, authorities, file);
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            } else {
+                uri = Uri.fromFile(file);
+            }
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             intent.setDataAndType(uri, MIME_TYPE_APK);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -275,12 +293,31 @@ public final class UpdateController implements Handler.Callback {
         return finish;
     }
 
-    private File downloadFile() throws Exception {
-        String state = Environment.getExternalStorageState();
-        if (!Environment.MEDIA_MOUNTED.equals(state)) {
-            throw new IllegalStateException("没有检测到可用的SD卡");
+    /**
+     * 从xml文件中获取下载路径，兼容安卓7.0+
+     *
+     * @param application
+     * @return
+     */
+    public static String downloadPath(Application application) {
+        final String TAG_FILES_PATH = "external-path";
+        final String ATTR_PATH = "path";
+        String path = "";
+        try {
+            XmlResourceParser xrp = application.getResources().getXml(R.xml.file_paths);
+            while (xrp.getEventType() != XmlResourceParser.END_DOCUMENT) {
+                if (xrp.getEventType() == XmlResourceParser.START_TAG) {
+                    String tagName = xrp.getName();
+                    if (tagName.endsWith(TAG_FILES_PATH)) {
+                        path = xrp.getAttributeValue(null, ATTR_PATH);
+                        break;
+                    }
+                }
+                xrp.next();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        File path = Environment.getExternalStorageDirectory();
-        return new File(path, DIRECTORY_DEFAULT);
+        return path;
     }
 }
