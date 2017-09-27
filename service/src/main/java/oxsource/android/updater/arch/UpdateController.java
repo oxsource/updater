@@ -2,7 +2,6 @@ package oxsource.android.updater.arch;
 
 import android.app.Application;
 import android.content.Intent;
-import android.content.res.XmlResourceParser;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -18,7 +17,6 @@ import java.io.FileOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import oxsource.android.updater.R;
 import oxsource.android.updater.listener.DownloadListener;
 import oxsource.android.updater.listener.UpdateValidator;
 import oxsource.android.updater.view.UpdateNotification;
@@ -29,6 +27,7 @@ import oxsource.android.updater.view.UpdateNotification;
  */
 
 public final class UpdateController implements Handler.Callback {
+    static String FILE_PROVIDER_AUTHORITIES = "";
     //整型常量
     private final int WHAT_VERIFY_START = 10;
     private final int WHAT_VERIFY_SUCCESS = 11;
@@ -40,7 +39,8 @@ public final class UpdateController implements Handler.Callback {
     private final int WHAT_DOWNLOAD_FAILURE = 23;
 
     //字符串常量
-    public final static String SUFFIX_APK = ".apk";
+    private final static String DOWNLOAD_PATH_DEFAULT = "download";
+    private final static String SUFFIX_APK = ".apk";
     private final static String METHOD_POST = "POST";
     private final static String KEY_CHARSET = "Charset";
     private final static String CHARSET_DEFAULT = "UTF-8";
@@ -110,6 +110,7 @@ public final class UpdateController implements Handler.Callback {
         BufferedInputStream bis = null;
         FileOutputStream fos = null;
         try {
+
             notifyHandler(WHAT_DOWNLOAD_START, null);
             //配置本地下载路径
             String state = Environment.getExternalStorageState();
@@ -119,7 +120,8 @@ public final class UpdateController implements Handler.Callback {
             if (!apkPath.endsWith(SUFFIX_APK)) {
                 apkPath += SUFFIX_APK;
             }
-            File apkFile = new File(Environment.getExternalStorageDirectory(), apkPath);
+            File dPath = new File(Environment.getExternalStorageDirectory(), DOWNLOAD_PATH_DEFAULT);
+            File apkFile = new File(dPath, apkPath);
             if (!apkFile.getParentFile().exists()) {
                 apkFile.getParentFile().mkdirs();
             }
@@ -169,8 +171,7 @@ public final class UpdateController implements Handler.Callback {
             File file = new File(path);
             Uri uri;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                String authorities = context.getString(R.string.updater_file_provider_authorities);
-                uri = FileProvider.getUriForFile(context, authorities, file);
+                uri = FileProvider.getUriForFile(context, FILE_PROVIDER_AUTHORITIES, file);
                 intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             } else {
                 uri = Uri.fromFile(file);
@@ -291,33 +292,5 @@ public final class UpdateController implements Handler.Callback {
                 break;
         }
         return finish;
-    }
-
-    /**
-     * 从xml文件中获取下载路径，兼容安卓7.0+
-     *
-     * @param application
-     * @return
-     */
-    public static String downloadPath(Application application) {
-        final String TAG_FILES_PATH = "external-path";
-        final String ATTR_PATH = "path";
-        String path = "";
-        try {
-            XmlResourceParser xrp = application.getResources().getXml(R.xml.file_paths);
-            while (xrp.getEventType() != XmlResourceParser.END_DOCUMENT) {
-                if (xrp.getEventType() == XmlResourceParser.START_TAG) {
-                    String tagName = xrp.getName();
-                    if (tagName.endsWith(TAG_FILES_PATH)) {
-                        path = xrp.getAttributeValue(null, ATTR_PATH);
-                        break;
-                    }
-                }
-                xrp.next();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return path;
     }
 }

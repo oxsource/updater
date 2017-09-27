@@ -25,14 +25,12 @@ public final class UpdateService extends Service {
 
     private final Executor threadPool = Executors.newCachedThreadPool();
     private UpdateNotification notification;
-    private String downloadPath;
 
     @Override
     public void onCreate() {
         super.onCreate();
         notification = new UpdateNotification(getApplicationContext());
-        downloadPath = UpdateController.downloadPath(getApplication());
-        log("UpdateService onCreate,download path=" + downloadPath);
+        log("UpdateService onCreate");
     }
 
     @Override
@@ -51,7 +49,7 @@ public final class UpdateService extends Service {
             case UpdateHandle.WHAT_DOWNLOAD:
                 log("UpdateService WHAT_DOWNLOAD");
                 String apkUrl = intent.getStringExtra(UpdateHandle.KEY_URL);
-                String apkPah = downloadPath + intent.getStringExtra(UpdateHandle.KEY_PATH);
+                String apkPah = intent.getStringExtra(UpdateHandle.KEY_PATH);
                 controller.notification(notification);
                 threadPool.execute(new DownloadRunnable(controller, apkPah, apkUrl));
                 break;

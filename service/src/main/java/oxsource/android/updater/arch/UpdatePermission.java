@@ -12,8 +12,14 @@ import android.support.annotation.NonNull;
  */
 
 public class UpdatePermission {
-    /*授权*/
-    public static void auth(@NonNull Activity activity) {
+    /**
+     * 更新授权
+     *
+     * @param activity
+     * @param authorities 7.0+版本FileProvider的authorities
+     */
+    public static void auth(@NonNull Activity activity, String authorities) {
+        UpdateController.FILE_PROVIDER_AUTHORITIES = authorities;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             String[] permissions = new String[]{
                     Manifest.permission.READ_EXTERNAL_STORAGE,

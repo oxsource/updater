@@ -34,7 +34,7 @@ public class MainActivity extends FragmentActivity {
         btCancel = (Button) findViewById(R.id.btCancel);
         btCancel.setOnClickListener(cklCancel);
         btCancel.setVisibility(View.GONE);
-        UpdatePermission.auth(this);
+        UpdatePermission.auth(this, getPackageName() + ".fileProvider");
     }
 
 

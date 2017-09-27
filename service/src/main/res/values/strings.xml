@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">updater</string>
-    <string name="updater_file_provider_authorities">oxsource.android.updater.file.provider</string>
 </resources>
