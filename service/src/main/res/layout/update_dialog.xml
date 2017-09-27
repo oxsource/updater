@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="32dp"
+    android:layout_margin="25dp"
     android:background="@drawable/update_dialog_bkg"
     android:orientation="vertical">
 
@@ -10,22 +10,18 @@
         android:id="@+id/tvName"
         style="@style/UpdateDialogPaddingChild"
         android:layout_height="@dimen/common_title_height"
-        android:gravity="center_vertical"
-        android:text="快车智网承运2.0.0build234alpha"
+        android:gravity="center"
+        android:text="发现新版本"
+        android:textColor="@color/text_gray_01"
         android:textSize="18sp" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/line_size_01"
-        android:background="@color/line_gray_01" />
 
     <TextView
         android:id="@+id/tvVersion"
         style="@style/UpdateDialogPaddingChild"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:lineSpacingExtra="5dp"
-        android:text="版本号：2.0.0\n包大小：8.4M\n更新时间：2017-09-27 18:45:21"
+        android:text="新版本号：2.0.0\n文件大小：8.4M\n更新时间：2017-09-27 18:45:21"
+        android:textColor="@color/text_gray_01"
         android:textSize="14sp" />
 
     <TextView
@@ -33,7 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:text="更新说明："
-        android:textSize="16sp" />
+        android:textColor="@color/text_gray_01"
+        android:textSize="14sp" />
 
 
     <TextView
@@ -41,12 +38,13 @@
         style="@style/UpdateDialogPaddingChild"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
         android:layout_marginTop="5dp"
         android:maxHeight="60dp"
         android:scrollbars="vertical"
-        android:text="1、新增-备注功能及装货确认，打通运输全流程；\n2、优化-页面改版好看好用，升级新体验；\n3、优化-删除抢单和一单多车调配，更贴合实际业务需求。"
+        android:text="部分小BUG及兼容性问题修复"
+        android:textColor="@color/text_gray_01"
         android:textSize="14sp" />
-
 
     <RelativeLayout
         android:id="@+id/rlDownloadProgress"
@@ -66,7 +64,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/pbDownload"
-            android:text="正在下载..." />
+            android:text="正在下载..."
+            android:textColor="@color/text_gray_01" />
 
         <TextView
             android:id="@+id/tvPercent"
@@ -74,7 +73,8 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@id/pbDownload"
-            android:text="100%" />
+            android:text="100%"
+            android:textColor="@color/text_gray_01" />
     </RelativeLayout>
 
     <View

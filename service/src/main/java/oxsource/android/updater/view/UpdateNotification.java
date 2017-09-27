@@ -19,7 +19,7 @@ public class UpdateNotification implements DownloadListener {
 
     private NotificationCompat.Builder mBuilder;
     private NotificationManager mNotificationManager;
-    private int mSmallIcon = R.drawable.ic_launcher;
+    private int mSmallIcon = R.drawable.ic_notification;
     private Context context;
 
     public UpdateNotification(Context context) {

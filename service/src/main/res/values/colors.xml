@@ -3,4 +3,6 @@
     <color name="line_gray_01">#8e8e8c</color>
     <color name="transport">#00000000</color>
     <color name="white">#FFFFFF</color>
+    <color name="update_dialog_background">#f2f2f2</color>
+    <color name="text_gray_01">#333333</color>
 </resources>

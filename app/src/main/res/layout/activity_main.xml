@@ -5,21 +5,35 @@
     android:orientation="vertical">
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/common_activity_margin"
+        android:layout_marginRight="@dimen/common_activity_margin"
+        android:layout_marginTop="45dp"
+        android:gravity="center_horizontal"
+        android:text="这是一个更新模块演示小样"
+        android:textColor="@color/text_gray_01"
+        android:textSize="18sp" />
+
+    <TextView
         android:id="@+id/tvInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp" />
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="@dimen/common_activity_margin"
+        android:layout_marginRight="@dimen/common_activity_margin"
+        android:layout_marginTop="20dp"
+        android:textColor="@color/text_gray_01" />
 
     <Button
         android:id="@+id/btVerify"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/common_button"
         android:text="检查更新" />
 
     <Button
         android:id="@+id/btCancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="取消" />
+        style="@style/common_button"
+        android:text="取消"
+        android:visibility="gone" />
 
 </LinearLayout>

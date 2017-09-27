@@ -85,11 +85,11 @@ public class UpdateFragment extends DialogFragment {
             return;
         }
         setCancelable(false);
-        tvName.setText(apkVersion.name() + apkVersion.versionName());
+        tvName.setText(apkVersion.name());
         //
         StringBuilder sb = new StringBuilder();
-        sb.append("版本：" + apkVersion.versionName() + "\n");
-        sb.append("包大小：" + apkVersion.fileSize() + "\n");
+        sb.append("新版本号：" + apkVersion.versionName() + "\n");
+        sb.append("文件大小：" + apkVersion.fileSize() + "\n");
         sb.append("更新时间：" + apkVersion.publishTime());
         tvVersion.setText(sb.toString());
         //
