@@ -90,7 +90,7 @@ public class UpdateFragment extends DialogFragment {
         StringBuilder sb = new StringBuilder();
         sb.append("新版本号：" + apkVersion.versionName() + "\n");
         sb.append("文件大小：" + apkVersion.fileSize() + "\n");
-        sb.append("更新时间：" + apkVersion.publishTime());
+        sb.append("更新时间：" + apkVersion.updateTime());
         tvVersion.setText(sb.toString());
         //
         tvUpdateDesc.setText(apkVersion.updateDesc());
@@ -134,7 +134,7 @@ public class UpdateFragment extends DialogFragment {
             if (rlDownloadProgress.getVisibility() != View.VISIBLE) {
                 rlDownloadProgress.setVisibility(View.VISIBLE);
             }
-            tvPercent.setText(progress + "%");
+            tvPercent.setText(String.format("%02d", progress) + "%");
             pbDownload.setProgress(progress);
         } else {
             rlDownloadProgress.setVisibility(View.GONE);
@@ -155,7 +155,7 @@ public class UpdateFragment extends DialogFragment {
             }
             updateHandle = new UpdateHandle.Builder()
                     .what(UpdateHandle.WHAT_DOWNLOAD)
-                    .path(apkVersion.englishName() + apkVersion.versionName())
+                    .path(apkVersion.fileName())
                     .url(apkVersion.filePath())
                     .download(downloadListener)
                     .build();

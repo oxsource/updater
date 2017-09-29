@@ -14,13 +14,6 @@ public interface UpdateVersion {
     String name();
 
     /**
-     * 应用名称
-     *
-     * @return
-     */
-    String englishName();
-
-    /**
      * 版本号
      *
      * @return
@@ -42,6 +35,13 @@ public interface UpdateVersion {
     String fileSize();
 
     /**
+     * 下载文件名称，APK英文名
+     *
+     * @return
+     */
+    String fileName();
+
+    /**
      * 文件MD5校验
      *
      * @return
@@ -60,7 +60,7 @@ public interface UpdateVersion {
      *
      * @return
      */
-    String publishTime();
+    String updateTime();
 
     /**
      * 更新说明

@@ -23,11 +23,6 @@ public class ApkVersion implements UpdateVersion {
     }
 
     @Override
-    public String englishName() {
-        return "test";
-    }
-
-    @Override
     public int versionCode() {
         return versionCode;
     }
@@ -35,6 +30,11 @@ public class ApkVersion implements UpdateVersion {
     @Override
     public String versionName() {
         return versionName;
+    }
+
+    @Override
+    public String fileName() {
+        return "test." + versionName();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ApkVersion implements UpdateVersion {
     }
 
     @Override
-    public String publishTime() {
+    public String updateTime() {
         return "2017-09-26 18:45:21";
     }
 
@@ -89,15 +89,6 @@ public class ApkVersion implements UpdateVersion {
 
     public void force(boolean force) {
         this.force = force;
-    }
-
-    @Override
-    public String toString() {
-        return "name=" + name +
-                ", versionCode=" + versionCode +
-                ", versionName=" + versionName +
-                ", updateDesc=" + updateDesc +
-                ", downloadPath=" + downloadPath;
     }
 
     public static ApkVersion fromJson(String json) throws Exception {
