@@ -25,6 +25,7 @@
         android:textSize="15sp" />
 
     <TextView
+        android:id="@+id/tvUpdateDescTitle"
         style="@style/UpdateDialogPaddingChild"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"

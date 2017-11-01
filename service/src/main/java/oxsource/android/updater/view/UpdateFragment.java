@@ -30,6 +30,7 @@ public class UpdateFragment extends DialogFragment {
     //基本信息模块
     private TextView tvName;
     private TextView tvVersion;
+    private TextView tvUpdateDescTitle;
     private TextView tvUpdateDesc;
     //下载进度模块
     private RelativeLayout rlDownloadProgress;
@@ -60,6 +61,7 @@ public class UpdateFragment extends DialogFragment {
         tvName = (TextView) view.findViewById(R.id.tvName);
         tvName.getPaint().setFakeBoldText(true);
         tvVersion = (TextView) view.findViewById(R.id.tvVersion);
+        tvUpdateDescTitle = (TextView) view.findViewById(R.id.tvUpdateDescTitle);
         tvUpdateDesc = (TextView) view.findViewById(R.id.tvUpdateDesc);
         //
         rlDownloadProgress = (RelativeLayout) view.findViewById(R.id.rlDownloadProgress);
@@ -69,7 +71,6 @@ public class UpdateFragment extends DialogFragment {
         btLeft = (Button) view.findViewById(R.id.btLeft);
         lineBtMiddle = view.findViewById(R.id.lineBtMiddle);
         btRight = (Button) view.findViewById(R.id.btRight);
-
         initWidgets();
         return view;
     }
@@ -80,28 +81,39 @@ public class UpdateFragment extends DialogFragment {
 
     private void initWidgets() {
         if (null == apkVersion) {
-            Toast.makeText(getContext(), "", Toast.LENGTH_SHORT).show();
-            dismiss();
-            return;
-        }
-        setCancelable(false);
-        tvName.setText(apkVersion.name());
-        //
-        StringBuilder sb = new StringBuilder();
-        sb.append("新版本号：" + apkVersion.versionName() + "\n");
-        sb.append("文件大小：" + apkVersion.fileSize() + "\n");
-        sb.append("更新时间：" + apkVersion.updateTime());
-        tvVersion.setText(sb.toString());
-        //
-        tvUpdateDesc.setText(apkVersion.updateDesc());
-        //
-        if (apkVersion.force()) {
-            setBottomButton(STR_DOWNLOAD_NOW, clkDownload, "", null);
+            setCancelable(false);
+            tvName.setText("提示");
+            setBottomButton("知道了", new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    dismiss();
+                }
+            }, "", null);
+            tvVersion.setVisibility(View.GONE);
+            tvUpdateDesc.setText("未发现新版本更新信息");
+            tvUpdateDescTitle.setVisibility(View.GONE);
         } else {
-            setBottomButton(STR_NEXT_TIME, clkCancel, STR_DOWNLOAD_NOW, clkDownload);
+            setCancelable(false);
+            tvName.setText(apkVersion.name());
+            //
+            StringBuilder sb = new StringBuilder();
+            sb.append("新版本号：" + apkVersion.versionName() + "\n");
+            sb.append("文件大小：" + apkVersion.fileSize() + "\n");
+            sb.append("更新时间：" + apkVersion.updateTime());
+            tvVersion.setVisibility(View.VISIBLE);
+            tvVersion.setText(sb.toString());
+            //
+            tvUpdateDescTitle.setVisibility(View.VISIBLE);
+            tvUpdateDesc.setText(apkVersion.updateDesc());
+            //
+            if (apkVersion.force()) {
+                setBottomButton(STR_DOWNLOAD_NOW, clkDownload, "", null);
+            } else {
+                setBottomButton(STR_NEXT_TIME, clkCancel, STR_DOWNLOAD_NOW, clkDownload);
+            }
+            //下载进度初始化
+            setDownloadProgress(-1);
         }
-        //下载进度初始化
-        setDownloadProgress(-1);
     }
 
     /*设置底部按钮*/
