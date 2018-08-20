@@ -25,9 +25,9 @@ public class UpdatePermission {
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
             };
-            for (int i = 0; i < permissions.length; i++) {
-                if (activity.checkSelfPermission(permissions[i]) != PackageManager.PERMISSION_GRANTED) {
-                    activity.requestPermissions(new String[]{permissions[i]}, 0);
+            for (String permission : permissions) {
+                if (activity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                    activity.requestPermissions(new String[]{permission}, 0);
                 }
             }
         }

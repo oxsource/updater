@@ -81,6 +81,8 @@ public final class UpdateController implements Handler.Callback {
             conn.setReadTimeout(TIME_OUT_MS);
             conn.setConnectTimeout(TIME_OUT_MS);
             conn.setRequestMethod(METHOD_POST);
+            conn.setDoOutput(true);
+            conn.setDoInput(true);
             conn.setRequestProperty(KEY_CHARSET, CHARSET_DEFAULT);
             conn.connect();
             //读取远程数据并写入ByteArrayOutputStream
@@ -129,7 +131,6 @@ public final class UpdateController implements Handler.Callback {
             //配置远程连接
             URL url = new URL(apkUrl);
             conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod(METHOD_POST);
             conn.setReadTimeout(TIME_OUT_MS);
             conn.setConnectTimeout(TIME_OUT_MS);
             conn.setRequestProperty(KEY_CHARSET, CHARSET_DEFAULT);

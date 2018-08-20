@@ -3,7 +3,7 @@ package oxsource.android.updater.view;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 import oxsource.android.updater.R;
 import oxsource.android.updater.UpdateHandle;
@@ -11,7 +11,6 @@ import oxsource.android.updater.listener.DownloadListener;
 
 /**
  * 通知栏消息展示管理类
- * Created by wangcheng on 2017/9/25.
  */
 
 public class UpdateNotification implements DownloadListener {
@@ -25,7 +24,11 @@ public class UpdateNotification implements DownloadListener {
     public UpdateNotification(Context context) {
         this.context = context;
         mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//
+//        } else {
         mBuilder = new NotificationCompat.Builder(context);
+//        }
     }
 
     public void smallIcon(int smallIconId) {
