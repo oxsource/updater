@@ -8,6 +8,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.content.FileProvider;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,7 +28,7 @@ import oxsource.android.updater.view.UpdateNotification;
  */
 
 public final class UpdateController implements Handler.Callback {
-    static String FILE_PROVIDER_AUTHORITIES = "";
+    private static String FILE_PROVIDER_AUTHORITIES = "";
     //整型常量
     private final int WHAT_VERIFY_START = 10;
     private final int WHAT_VERIFY_SUCCESS = 11;
@@ -47,13 +48,20 @@ public final class UpdateController implements Handler.Callback {
     private final static String MIME_TYPE_APK = "application/vnd.android.package-archive";
     private final static String ERROR_DEFAULT_VALIDATE = "检查版本信息异常";
     private final static String ERROR_DEFAULT_DOWNLOAD = "下载更新异常";
-    private final int TIME_OUT_MS = 5 * 1000;
-    private final int TIME_INTERVAL_MS = 500;
+    private final int TIME_OUT_MS = 15 * 1000;
     //监听回调
     private final Handler handler = new Handler(this);
     private UpdateValidator validator;
     private DownloadListener dListener;
     private UpdateNotification notification;
+
+    public static void authority(String authorities) {
+        FILE_PROVIDER_AUTHORITIES = authorities;
+    }
+
+    public String getTag() {
+        return toString();
+    }
 
     public void validator(UpdateValidator validator) {
         this.validator = validator;
@@ -70,6 +78,7 @@ public final class UpdateController implements Handler.Callback {
         notification = ntf;
     }
 
+
     public void verify(final String verifyUrl) {
         HttpURLConnection conn = null;
         BufferedInputStream bis = null;
@@ -80,9 +89,6 @@ public final class UpdateController implements Handler.Callback {
             conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(TIME_OUT_MS);
             conn.setConnectTimeout(TIME_OUT_MS);
-            conn.setRequestMethod(METHOD_POST);
-            conn.setDoOutput(true);
-            conn.setDoInput(true);
             conn.setRequestProperty(KEY_CHARSET, CHARSET_DEFAULT);
             conn.connect();
             //读取远程数据并写入ByteArrayOutputStream
@@ -99,8 +105,8 @@ public final class UpdateController implements Handler.Callback {
             UpdateVersion value = validator.onVerify(new String(arrays, CHARSET_DEFAULT));
             notifyHandler(WHAT_VERIFY_SUCCESS, value);
         } catch (Exception e) {
-            String error = null == e ? ERROR_DEFAULT_VALIDATE : e.getMessage();
-            notifyHandler(WHAT_VERIFY_FAILURE, error);
+            e.printStackTrace();
+            notifyHandler(WHAT_VERIFY_FAILURE, ERROR_DEFAULT_VALIDATE);
         } finally {
             quitHttp(conn);
             quitClose(bis);
@@ -112,7 +118,6 @@ public final class UpdateController implements Handler.Callback {
         BufferedInputStream bis = null;
         FileOutputStream fos = null;
         try {
-
             notifyHandler(WHAT_DOWNLOAD_START, null);
             //配置本地下载路径
             String state = Environment.getExternalStorageState();
@@ -125,7 +130,11 @@ public final class UpdateController implements Handler.Callback {
             File dPath = new File(Environment.getExternalStorageDirectory(), DOWNLOAD_PATH_DEFAULT);
             File apkFile = new File(dPath, apkPath);
             if (!apkFile.getParentFile().exists()) {
-                apkFile.getParentFile().mkdirs();
+                if (!apkFile.getParentFile().mkdirs()) {
+                    int a = 1;
+                    System.out.print(a);
+                    Log.d("", "mkdirs return failure");
+                }
             }
             fos = new FileOutputStream(apkFile);
             //配置远程连接
@@ -147,6 +156,7 @@ public final class UpdateController implements Handler.Callback {
                 fos.write(buffer, 0, len);
                 POSITIONS[1] += len;
                 long nowReadMs = System.currentTimeMillis();
+                int TIME_INTERVAL_MS = 500;
                 if ((nowReadMs - lastReadMs) >= TIME_INTERVAL_MS) {
                     notifyHandler(WHAT_DOWNLOAD_PROGRESS, POSITIONS);
                     lastReadMs = nowReadMs;
@@ -154,8 +164,8 @@ public final class UpdateController implements Handler.Callback {
             }
             notifyHandler(WHAT_DOWNLOAD_SUCCESS, apkFile.getAbsolutePath());
         } catch (Exception e) {
-            String error = null == e ? ERROR_DEFAULT_DOWNLOAD : e.getMessage();
-            notifyHandler(WHAT_DOWNLOAD_FAILURE, error);
+            e.printStackTrace();
+            notifyHandler(WHAT_DOWNLOAD_FAILURE, ERROR_DEFAULT_DOWNLOAD);
         } finally {
             quitHttp(conn);
             quitClose(bis);
@@ -164,9 +174,8 @@ public final class UpdateController implements Handler.Callback {
 
     }
 
-    public boolean install(Application context, String path) {
+    public void install(Application context, String path) {
         notification(null);
-        boolean value = false;
         try {
             Intent intent = new Intent(Intent.ACTION_VIEW);
             File file = new File(path);
@@ -181,11 +190,9 @@ public final class UpdateController implements Handler.Callback {
             intent.setDataAndType(uri, MIME_TYPE_APK);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            value = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return value;
     }
 
     @Override

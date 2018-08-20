@@ -18,7 +18,7 @@ import oxsource.android.updater.listener.UpdateValidator;
  */
 
 public class UpdateHandle {
-    public final static String ACTION_SERVICE = "oxsource.android.updater.UpdatePower";
+    final static String ACTION_SERVICE = "oxsource.android.updater.UpdatePower";
     public final static String KEY_WHAT = "key_what";
     public final static int WHAT_VERIFY = 1;
     public final static int WHAT_DOWNLOAD = 2;
@@ -46,8 +46,8 @@ public class UpdateHandle {
     }
 
     private void build(Context context) {
-        String tag = controller.toString();
-        if (!controllers.containsKey(controllers)) {
+        String tag = controller.getTag();
+        if (!controllers.containsKey(tag)) {
             controllers.put(tag, controller);
             intent.putExtra(KEY_CONTROLLER_TAG, tag);
             intent.setPackage(context.getPackageName());
@@ -56,9 +56,6 @@ public class UpdateHandle {
 
     /**
      * 启动service并返回Intent
-     *
-     * @param context
-     * @return
      */
     public Intent intent(@NonNull Context context) {
         build(context);
@@ -68,9 +65,6 @@ public class UpdateHandle {
 
     /**
      * 不启动service并返回Intent
-     *
-     * @param context
-     * @return
      */
     public PendingIntent pendingIntent(@NonNull Context context) {
         build(context);
@@ -84,7 +78,7 @@ public class UpdateHandle {
         controller.validator(null);
         controller.downloadListener(null);
         controller.notification(null);
-        controllers.remove(controller);
+        controllers.remove(controller.getTag());
     }
 
     /**

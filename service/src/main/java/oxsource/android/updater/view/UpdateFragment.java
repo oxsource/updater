@@ -1,6 +1,8 @@
 package oxsource.android.updater.view;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.text.TextUtils;
@@ -17,6 +19,7 @@ import android.widget.Toast;
 
 import oxsource.android.updater.R;
 import oxsource.android.updater.UpdateHandle;
+import oxsource.android.updater.arch.UpdatePermission;
 import oxsource.android.updater.arch.UpdateVersion;
 import oxsource.android.updater.listener.DownloadListener;
 
@@ -26,7 +29,6 @@ import oxsource.android.updater.listener.DownloadListener;
 
 public class UpdateFragment extends DialogFragment {
     private final String TAG = UpdateFragment.class.getSimpleName();
-    private final int PROGRESS_MAX = 100;
     //基本信息模块
     private TextView tvName;
     private TextView tvVersion;
@@ -41,42 +43,32 @@ public class UpdateFragment extends DialogFragment {
     private View lineBtMiddle;
     private Button btRight;
 
-    //字符串文案
-    private final String STR_DOWNLOAD_NOW = "立即更新";
-    private final String STR_DOWNLOAD_CANCEL = "取消下载";
-    private final String STR_NEXT_TIME = "下次再说";
-
-    private final String STR_DOWNLOAD_AGAIN = "重新下载";
+    private String STR_NEXT_TIME = "下次再说";
 
     private UpdateVersion apkVersion;
     private UpdateHandle updateHandle;
-    private DownloadListener outDownloadListener;//外部注册的下载监听器
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater lf, @Nullable ViewGroup vg, @Nullable Bundle bundle) {
-        View view = lf.inflate(R.layout.update_dialog, null, false);
+    public View onCreateView(@NonNull LayoutInflater lf, @Nullable ViewGroup root, @Nullable Bundle bundle) {
+        View view = lf.inflate(R.layout.update_dialog, root, false);
         getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
         //
-        tvName = (TextView) view.findViewById(R.id.tvName);
+        tvName = view.findViewById(R.id.tvName);
         tvName.getPaint().setFakeBoldText(true);
-        tvVersion = (TextView) view.findViewById(R.id.tvVersion);
-        tvUpdateDescTitle = (TextView) view.findViewById(R.id.tvUpdateDescTitle);
-        tvUpdateDesc = (TextView) view.findViewById(R.id.tvUpdateDesc);
+        tvVersion = view.findViewById(R.id.tvVersion);
+        tvUpdateDescTitle = view.findViewById(R.id.tvUpdateDescTitle);
+        tvUpdateDesc = view.findViewById(R.id.tvUpdateDesc);
         //
-        rlDownloadProgress = (RelativeLayout) view.findViewById(R.id.rlDownloadProgress);
-        pbDownload = (ProgressBar) view.findViewById(R.id.pbDownload);
-        tvPercent = (TextView) view.findViewById(R.id.tvPercent);
+        rlDownloadProgress = view.findViewById(R.id.rlDownloadProgress);
+        pbDownload = view.findViewById(R.id.pbDownload);
+        tvPercent = view.findViewById(R.id.tvPercent);
         //
-        btLeft = (Button) view.findViewById(R.id.btLeft);
+        btLeft = view.findViewById(R.id.btLeft);
         lineBtMiddle = view.findViewById(R.id.lineBtMiddle);
-        btRight = (Button) view.findViewById(R.id.btRight);
+        btRight = view.findViewById(R.id.btRight);
         initWidgets();
         return view;
-    }
-
-    public void setDownloadListener(DownloadListener listener) {
-        outDownloadListener = listener;
     }
 
     private void initWidgets() {
@@ -96,20 +88,20 @@ public class UpdateFragment extends DialogFragment {
             setCancelable(false);
             tvName.setText(apkVersion.name());
             //
-            StringBuilder sb = new StringBuilder();
-            sb.append("新版本号：" + apkVersion.versionName() + "\n");
-            sb.append("文件大小：" + apkVersion.fileSize() + "\n");
-            sb.append("更新时间：" + apkVersion.updateTime());
+            String sb = "新版本号：" + apkVersion.versionName() + "\n" +
+                    "文件大小：" + apkVersion.fileSize() + "\n" +
+                    "更新时间：" + apkVersion.updateTime();
             tvVersion.setVisibility(View.VISIBLE);
-            tvVersion.setText(sb.toString());
+            tvVersion.setText(sb);
             //
             tvUpdateDescTitle.setVisibility(View.VISIBLE);
             tvUpdateDesc.setText(apkVersion.updateDesc());
             //
+            String download = "立即更新";
             if (apkVersion.force()) {
-                setBottomButton(STR_DOWNLOAD_NOW, clkDownload, "", null);
+                setBottomButton(download, clkDownload, "", null);
             } else {
-                setBottomButton(STR_NEXT_TIME, clkCancel, STR_DOWNLOAD_NOW, clkDownload);
+                setBottomButton(STR_NEXT_TIME, clkCancel, download, clkDownload);
             }
             //下载进度初始化
             setDownloadProgress(-1);
@@ -142,21 +134,24 @@ public class UpdateFragment extends DialogFragment {
 
     /*设置下载进度*/
     private void setDownloadProgress(int progress) {
-        if (progress >= 0 && progress <= PROGRESS_MAX) {
+        int maxProcess = 100;
+        if (progress >= 0 && progress <= maxProcess) {
             if (rlDownloadProgress.getVisibility() != View.VISIBLE) {
                 rlDownloadProgress.setVisibility(View.VISIBLE);
             }
-            tvPercent.setText(String.format("%02d", progress) + "%");
+            String progressText = progress + "%";
+            tvPercent.setText(progressText);
             pbDownload.setProgress(progress);
         } else {
             rlDownloadProgress.setVisibility(View.GONE);
-            pbDownload.setMax(PROGRESS_MAX);
+            pbDownload.setMax(maxProcess);
         }
     }
 
     public void setApkVersion(UpdateVersion apkVersion) {
         this.apkVersion = apkVersion;
     }
+
 
     /*点击下载*/
     private View.OnClickListener clkDownload = new View.OnClickListener() {
@@ -165,15 +160,28 @@ public class UpdateFragment extends DialogFragment {
             if (null != updateHandle) {
                 updateHandle.destroy();
             }
-            updateHandle = new UpdateHandle.Builder()
-                    .what(UpdateHandle.WHAT_DOWNLOAD)
-                    .path(apkVersion.fileName())
-                    .url(apkVersion.filePath())
-                    .download(downloadListener)
-                    .build();
-            updateHandle.intent(getContext());
+            Activity activity = getActivity();
+            if (null == activity || activity.isFinishing()) return;
+            //确认下载权限
+            startDownload();
         }
     };
+
+    //开始下载
+    private boolean startDownload() {
+        Activity activity = getActivity();
+        if (null == activity || activity.isFinishing()) return false;
+        //确认下载权限
+        if (!UpdatePermission.ensureDownload(activity)) return false;
+        updateHandle = new UpdateHandle.Builder()
+                .what(UpdateHandle.WHAT_DOWNLOAD)
+                .path(apkVersion.fileName())
+                .url(apkVersion.filePath())
+                .download(downloadListener)
+                .build();
+        updateHandle.intent(activity);
+        return true;
+    }
 
     /*点击取消*/
     private View.OnClickListener clkCancel = new View.OnClickListener() {
@@ -187,23 +195,26 @@ public class UpdateFragment extends DialogFragment {
         }
     };
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (UpdatePermission.REQUEST_DOWNLOAD == requestCode) {
+            if (startDownload()) return;
+            showToast("未能获取读写权限");
+        }
+    }
+
     private DownloadListener downloadListener = new DownloadListener() {
         @Override
         public void onStart() {
             setDownloadProgress(0);
-            setBottomButton(STR_DOWNLOAD_CANCEL, clkCancel, "", null);
-            if (null != outDownloadListener) {
-                outDownloadListener.onStart();
-            }
+            setBottomButton("取消下载", clkCancel, "", null);
         }
 
         @Override
         public void onProgress(int current, int total) {
             int progress = (int) (current / (total / 1.0) * 100);
             setDownloadProgress(progress);
-            if (null != outDownloadListener) {
-                outDownloadListener.onProgress(current, total);
-            }
         }
 
         @Override
@@ -211,10 +222,7 @@ public class UpdateFragment extends DialogFragment {
             Log.d(TAG, message);
             showToast("下载出错！");
             setDownloadProgress(-1);
-            setBottomButton(STR_DOWNLOAD_AGAIN, clkDownload, STR_NEXT_TIME, clkCancel);
-            if (null != outDownloadListener) {
-                outDownloadListener.onFailure(code, message);
-            }
+            setBottomButton("重新下载", clkDownload, STR_NEXT_TIME, clkCancel);
         }
 
         @Override
@@ -222,20 +230,21 @@ public class UpdateFragment extends DialogFragment {
             setDownloadProgress(-1);
             setBottomButton("", null, "", null);
             dismiss();
+            if (TextUtils.isEmpty(filePath)) return;
+            Activity activity = getActivity();
+            if (null == activity || activity.isFinishing()) return;
+            //确认安装权限
             new UpdateHandle.Builder()
                     .what(UpdateHandle.WHAT_INSTALL)
                     .path(filePath)
                     .build()
-                    .intent(getContext());
-            if (null != outDownloadListener) {
-                outDownloadListener.onSuccess(filePath);
-            }
+                    .intent(activity);
         }
     };
 
+
     private void showToast(String msg) {
-        if (!TextUtils.isEmpty(msg)) {
-            Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-        }
+        if (TextUtils.isEmpty(msg)) return;
+        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 }
