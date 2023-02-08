@@ -48,7 +48,7 @@ public class UpdateFragment extends DialogFragment {
 
     private static final String STR_NEXT_TIME = "下次再说";
 
-    private UpdateVersion apkVersion;
+    private UpdateVersion version;
     private UpdateHandle updateHandle;
 
     @Nullable
@@ -78,7 +78,7 @@ public class UpdateFragment extends DialogFragment {
     }
 
     private void initWidgets() {
-        if (null == apkVersion) {
+        if (null == version) {
             setCancelable(false);
             tvName.setText("提示");
             setBottomButton("知道了", v -> dismiss(), "", null);
@@ -87,27 +87,31 @@ public class UpdateFragment extends DialogFragment {
             tvUpdateDescTitle.setVisibility(View.GONE);
         } else {
             setCancelable(false);
-            tvName.setText(apkVersion.name());
+            String title = "发现新版本";
+            if (!TextUtils.isEmpty(version.getAppName())) {
+                title = version.getAppName();
+            }
+            tvName.setText(title);
             //
             StringBuilder sb = new StringBuilder();
-            if (!TextUtils.isEmpty(apkVersion.versionName())) {
-                sb.append("新版本号：").append(apkVersion.versionName()).append("\n");
+            if (!TextUtils.isEmpty(version.getVersionName())) {
+                sb.append("新版本号：").append(version.getVersionName()).append("\n");
             }
-            if (!TextUtils.isEmpty(apkVersion.fileSize())) {
-                sb.append("文件大小：").append(apkVersion.fileSize()).append("\n");
+            if (!TextUtils.isEmpty(version.getFileSize())) {
+                sb.append("文件大小：").append(version.getFileSize()).append("\n");
             }
-            if (!TextUtils.isEmpty(apkVersion.updateTime())) {
-                sb.append("更新时间：").append(apkVersion.updateTime());
+            if (!TextUtils.isEmpty(version.getUpdateTime())) {
+                sb.append("更新时间：").append(version.getUpdateTime());
             }
             String version = sb.toString();
             tvVersion.setVisibility(version.isEmpty() ? View.GONE : View.VISIBLE);
             tvVersion.setText(version);
             //
             tvUpdateDescTitle.setVisibility(View.VISIBLE);
-            tvUpdateDesc.setText(apkVersion.updateDesc());
+            tvUpdateDesc.setText(this.version.getUpdateDesc());
             //
             String download = "立即更新";
-            if (apkVersion.force()) {
+            if (this.version.force()) {
                 setBottomButton(download, clkDownload, "", null);
             } else {
                 setBottomButton(STR_NEXT_TIME, clkCancel, download, clkDownload);
@@ -157,8 +161,8 @@ public class UpdateFragment extends DialogFragment {
         }
     }
 
-    public void setApkVersion(UpdateVersion apkVersion) {
-        this.apkVersion = apkVersion;
+    public void setVersion(UpdateVersion version) {
+        this.version = version;
     }
 
 
@@ -182,10 +186,11 @@ public class UpdateFragment extends DialogFragment {
         if (null == activity || activity.isFinishing()) return false;
         //确认下载权限
         if (!UpdatePermission.ensureDownload(activity)) return false;
+        String apkName = version.getPackageName() + "_" + version.getVersionName();
         updateHandle = new UpdateHandle.Builder()
                 .what(UpdateHandle.WHAT_DOWNLOAD)
-                .path(apkVersion.fileName())
-                .url(apkVersion.filePath())
+                .path(apkName)
+                .url(version.getFilePath())
                 .download(downloadListener)
                 .build();
         updateHandle.intent(activity);

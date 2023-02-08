@@ -42,15 +42,16 @@ public class MainActivity extends FragmentActivity {
     private final View.OnClickListener cklVerify = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            if (null != updateHandle) {
-                updateHandle.destroy();
-            }
-            updateHandle = new UpdateHandle.Builder()
-                    .what(UpdateHandle.WHAT_VERIFY)
-                    .url("http://ojnvtxoyg.bkt.clouddn.com/apk_version.json")
-                    .validator(validator)
-                    .build();
-            updateHandle.intent(getBaseContext());
+            //调用嘀嗒接口获取更新信息
+            ApkVersion version = new ApkVersion();
+            version.setAppName("嘀嗒承运");
+            version.setPackageName(getPackageName());
+            version.setUpdateDesc("部分问题修复");
+            version.setDownloadPath("https://static.campushoy.com/apps/landingPage/apk/cpdaily/cpdaily_9.3.3.apk");
+            version.setVersionName("1.0.0");
+            version.setForce(true);
+            updateFragment.setVersion(version);
+            updateFragment.show(getSupportFragmentManager(), "");
         }
     };
 
@@ -75,7 +76,7 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public ApkVersion onVerify(String string) throws Exception {
-            return ApkVersion.fromJson(getApplicationContext(), string);
+            return ApkVersion.fromJson(string);
         }
 
         @Override
@@ -91,7 +92,7 @@ public class MainActivity extends FragmentActivity {
             tvInfo.setText("");
             btCancel.setVisibility(View.GONE);
             btVerify.setVisibility(View.VISIBLE);
-            updateFragment.setApkVersion(value);
+            updateFragment.setVersion(value);
             updateFragment.show(getSupportFragmentManager(), "");
         }
     };

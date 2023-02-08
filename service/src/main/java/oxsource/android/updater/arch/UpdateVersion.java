@@ -9,47 +9,37 @@ public interface UpdateVersion {
     /**
      * 应用名称
      */
-    String name();
-
-    /**
-     * 版本号
-     */
-    int versionCode();
+    String getAppName();
 
     /**
      * 版本名称
      */
-    String versionName();
+    String getVersionName();
 
     /**
      * 文件大小
      */
-    String fileSize();
+    String getFileSize();
 
     /**
-     * 下载文件名称，APK英文名
+     * 包名
      */
-    String fileName();
-
-    /**
-     * 文件MD5校验
-     */
-    String fileMd5();
+    String getPackageName();
 
     /**
      * 文件下载路径
      */
-    String filePath();
+    String getFilePath();
 
     /**
      * 更新发布时间
      */
-    String updateTime();
+    String getUpdateTime();
 
     /**
      * 更新说明
      */
-    String updateDesc();
+    String getUpdateDesc();
 
     /**
      * 是否强制更新

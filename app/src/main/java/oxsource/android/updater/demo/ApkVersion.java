@@ -1,7 +1,5 @@
 package oxsource.android.updater.demo;
 
-import android.content.Context;
-
 import org.json.JSONObject;
 
 import oxsource.android.updater.arch.UpdateVersion;
@@ -12,58 +10,45 @@ import oxsource.android.updater.arch.UpdateVersion;
  */
 
 public class ApkVersion implements UpdateVersion {
-    private String name;//APP名称
-    private int versionCode;//版本号
+    private String appName;//APP名称
     private String versionName;//版本名称
     private String updateDesc;//更新提示
     private String downloadPath;//文件远程下载地址
     private boolean force;//强制升级
-    //下载本地文件名称
-    private String fileName;
-
+    private String packageName; //包名
 
     @Override
-    public String name() {
-        return name;
+    public String getAppName() {
+        return appName;
     }
 
     @Override
-    public int versionCode() {
-        return versionCode;
-    }
-
-    @Override
-    public String versionName() {
+    public String getVersionName() {
         return versionName;
     }
 
     @Override
-    public String fileName() {
-        return fileName;
+    public String getPackageName() {
+        return packageName;
     }
 
     @Override
-    public String fileSize() {
+    public String getFileSize() {
         return "";
     }
 
     @Override
-    public String fileMd5() {
-        return "";
-    }
-
-    @Override
-    public String filePath() {
+    public String getFilePath() {
         return downloadPath;
     }
 
     @Override
-    public String updateTime() {
+    public String getUpdateTime() {
         return "";
     }
 
     @Override
-    public String updateDesc() {
+    public String getUpdateDesc() {
         return updateDesc;
     }
 
@@ -72,40 +57,38 @@ public class ApkVersion implements UpdateVersion {
         return force;
     }
 
-    public void name(String name) {
-        this.name = name;
+    public void setAppName(String name) {
+        this.appName = name;
     }
 
-    public void versionCode(int versionCode) {
-        this.versionCode = versionCode;
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
-    public void versionName(String versionName) {
+    public void setVersionName(String versionName) {
         this.versionName = versionName;
     }
 
-    public void updateDesc(String updateDesc) {
+    public void setUpdateDesc(String updateDesc) {
         this.updateDesc = updateDesc;
     }
 
-    public void downloadPath(String downloadPath) {
+    public void setDownloadPath(String downloadPath) {
         this.downloadPath = downloadPath;
     }
 
-    public void force(boolean force) {
+    public void setForce(boolean force) {
         this.force = force;
     }
 
-    public static ApkVersion fromJson(Context context, String json) throws Exception {
+    public static ApkVersion fromJson(String json) throws Exception {
         JSONObject jbt = new JSONObject(json);
         ApkVersion version = new ApkVersion();
-        version.name(jbt.optString("name"));
-        version.versionCode(jbt.optInt("version"));
-        version.versionName(jbt.optString("versionName"));
-        version.updateDesc(jbt.optString("upgradeFeature"));
-        version.downloadPath(jbt.optString("downloadUrl"));
-        version.force(jbt.optBoolean("forceUpgrade"));
-        version.fileName = context.getPackageName() + version.versionCode + ".apk";
+        version.setAppName(jbt.optString("name"));
+        version.setVersionName(jbt.optString("versionName"));
+        version.setUpdateDesc(jbt.optString("upgradeFeature"));
+        version.setDownloadPath(jbt.optString("downloadUrl"));
+        version.setForce(jbt.optBoolean("forceUpgrade"));
         return version;
     }
 }
