@@ -1,5 +1,7 @@
 package oxsource.android.updater.demo;
 
+import android.content.Context;
+
 import org.json.JSONObject;
 
 import oxsource.android.updater.arch.UpdateVersion;
@@ -16,6 +18,9 @@ public class ApkVersion implements UpdateVersion {
     private String updateDesc;//更新提示
     private String downloadPath;//文件远程下载地址
     private boolean force;//强制升级
+    //下载本地文件名称
+    private String fileName;
+
 
     @Override
     public String name() {
@@ -34,17 +39,17 @@ public class ApkVersion implements UpdateVersion {
 
     @Override
     public String fileName() {
-        return "test." + versionName();
+        return fileName;
     }
 
     @Override
     public String fileSize() {
-        return "8.4M";
+        return "";
     }
 
     @Override
     public String fileMd5() {
-        return "0CA175B9C0F726A831D895E269332461";
+        return "";
     }
 
     @Override
@@ -54,7 +59,7 @@ public class ApkVersion implements UpdateVersion {
 
     @Override
     public String updateTime() {
-        return "2017-09-26 18:45:21";
+        return "";
     }
 
     @Override
@@ -91,15 +96,16 @@ public class ApkVersion implements UpdateVersion {
         this.force = force;
     }
 
-    public static ApkVersion fromJson(String json) throws Exception {
+    public static ApkVersion fromJson(Context context, String json) throws Exception {
         JSONObject jbt = new JSONObject(json);
         ApkVersion version = new ApkVersion();
         version.name(jbt.optString("name"));
-        version.versionCode(jbt.optInt("versionCode"));
+        version.versionCode(jbt.optInt("version"));
         version.versionName(jbt.optString("versionName"));
-        version.updateDesc(jbt.optString("updateDesc"));
-        version.downloadPath(jbt.optString("downloadPath"));
-        version.force(jbt.optBoolean("force"));
+        version.updateDesc(jbt.optString("upgradeFeature"));
+        version.downloadPath(jbt.optString("downloadUrl"));
+        version.force(jbt.optBoolean("forceUpgrade"));
+        version.fileName = context.getPackageName() + version.versionCode + ".apk";
         return version;
     }
 }

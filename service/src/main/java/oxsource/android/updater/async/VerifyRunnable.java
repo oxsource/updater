@@ -8,8 +8,8 @@ import oxsource.android.updater.arch.UpdateController;
  */
 
 public class VerifyRunnable implements Runnable {
-    private String verifyUrl;
-    private UpdateController handler;
+    private final String verifyUrl;
+    private final UpdateController handler;
 
     public VerifyRunnable(UpdateController handler, String verifyUrl) {
         this.handler = handler;

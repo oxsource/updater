@@ -7,7 +7,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.content.FileProvider;
+
+import androidx.core.content.FileProvider;
+
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -100,9 +102,8 @@ public final class UpdateController implements Handler.Callback {
                 bos.write(buffer, 0, len);
             }
             bos.flush();
-            byte[] arrays = bos.toByteArray();
             bos.reset();
-            UpdateVersion value = validator.onVerify(new String(arrays, CHARSET_DEFAULT));
+            UpdateVersion value = validator.onVerify(bos.toString(CHARSET_DEFAULT));
             notifyHandler(WHAT_VERIFY_SUCCESS, value);
         } catch (Exception e) {
             e.printStackTrace();
@@ -147,9 +148,7 @@ public final class UpdateController implements Handler.Callback {
             //读取
             bis = new BufferedInputStream(conn.getInputStream());
             byte[] buffer = new byte[10 * 1024];
-            final int[] POSITIONS = new int[2];
-            POSITIONS[0] = conn.getContentLength();
-            POSITIONS[1] = 0;
+            final int[] POSITIONS = new int[]{conn.getContentLength(), 0};
             int len;
             long lastReadMs = 0;
             while ((len = bis.read(buffer)) != -1) {

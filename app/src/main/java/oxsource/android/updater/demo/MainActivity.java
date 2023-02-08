@@ -1,15 +1,16 @@
 package oxsource.android.updater.demo;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.FragmentActivity;
+
 import oxsource.android.updater.UpdateHandle;
-import oxsource.android.updater.arch.UpdatePermission;
+import oxsource.android.updater.arch.UpdateController;
 import oxsource.android.updater.arch.UpdateVersion;
 import oxsource.android.updater.listener.UpdateValidator;
 import oxsource.android.updater.view.UpdateFragment;
@@ -34,11 +35,11 @@ public class MainActivity extends FragmentActivity {
         btCancel = (Button) findViewById(R.id.btCancel);
         btCancel.setOnClickListener(cklCancel);
         btCancel.setVisibility(View.GONE);
-        UpdatePermission.auth(this, getPackageName() + ".fileProvider");
+        UpdateController.authority(getPackageName() + ".fileProvider");
     }
 
 
-    private View.OnClickListener cklVerify = new View.OnClickListener() {
+    private final View.OnClickListener cklVerify = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             if (null != updateHandle) {
@@ -53,7 +54,7 @@ public class MainActivity extends FragmentActivity {
         }
     };
 
-    private View.OnClickListener cklCancel = new View.OnClickListener() {
+    private final View.OnClickListener cklCancel = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             btVerify.setVisibility(View.VISIBLE);
@@ -64,7 +65,7 @@ public class MainActivity extends FragmentActivity {
         }
     };
 
-    private UpdateValidator validator = new UpdateValidator() {
+    private final UpdateValidator validator = new UpdateValidator() {
         @Override
         public void onStart() {
             btVerify.setVisibility(View.GONE);
@@ -74,7 +75,7 @@ public class MainActivity extends FragmentActivity {
 
         @Override
         public ApkVersion onVerify(String string) throws Exception {
-            return ApkVersion.fromJson(string);
+            return ApkVersion.fromJson(getApplicationContext(), string);
         }
 
         @Override

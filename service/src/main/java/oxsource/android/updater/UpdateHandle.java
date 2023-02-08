@@ -3,7 +3,7 @@ package oxsource.android.updater;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +35,8 @@ public class UpdateHandle {
         return controllers.get(key);
     }
 
-    private Intent intent;
-    private UpdateController controller;
+    private final Intent intent;
+    private final UpdateController controller;
 
     private UpdateHandle(Builder builder) {
         intent = builder.intent;
@@ -85,7 +85,7 @@ public class UpdateHandle {
      * 构建类
      */
     public static class Builder {
-        private Intent intent = new Intent(ACTION_SERVICE);
+        private final Intent intent = new Intent(ACTION_SERVICE);
         private UpdateValidator validator;
         private DownloadListener listener;
 

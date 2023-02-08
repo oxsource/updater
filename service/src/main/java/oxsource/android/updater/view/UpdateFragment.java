@@ -1,10 +1,13 @@
 package oxsource.android.updater.view;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +46,7 @@ public class UpdateFragment extends DialogFragment {
     private View lineBtMiddle;
     private Button btRight;
 
-    private String STR_NEXT_TIME = "下次再说";
+    private static final String STR_NEXT_TIME = "下次再说";
 
     private UpdateVersion apkVersion;
     private UpdateHandle updateHandle;
@@ -52,7 +55,10 @@ public class UpdateFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater lf, @Nullable ViewGroup root, @Nullable Bundle bundle) {
         View view = lf.inflate(R.layout.update_dialog, root, false);
-        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE);
+        Dialog dialog = getDialog();
+        if (null != dialog) {
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        }
         //
         tvName = view.findViewById(R.id.tvName);
         tvName.getPaint().setFakeBoldText(true);
@@ -75,12 +81,7 @@ public class UpdateFragment extends DialogFragment {
         if (null == apkVersion) {
             setCancelable(false);
             tvName.setText("提示");
-            setBottomButton("知道了", new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dismiss();
-                }
-            }, "", null);
+            setBottomButton("知道了", v -> dismiss(), "", null);
             tvVersion.setVisibility(View.GONE);
             tvUpdateDesc.setText("未发现新版本更新信息");
             tvUpdateDescTitle.setVisibility(View.GONE);
@@ -88,11 +89,19 @@ public class UpdateFragment extends DialogFragment {
             setCancelable(false);
             tvName.setText(apkVersion.name());
             //
-            String sb = "新版本号：" + apkVersion.versionName() + "\n" +
-                    "文件大小：" + apkVersion.fileSize() + "\n" +
-                    "更新时间：" + apkVersion.updateTime();
-            tvVersion.setVisibility(View.VISIBLE);
-            tvVersion.setText(sb);
+            StringBuilder sb = new StringBuilder();
+            if (!TextUtils.isEmpty(apkVersion.versionName())) {
+                sb.append("新版本号：").append(apkVersion.versionName()).append("\n");
+            }
+            if (!TextUtils.isEmpty(apkVersion.fileSize())) {
+                sb.append("文件大小：").append(apkVersion.fileSize()).append("\n");
+            }
+            if (!TextUtils.isEmpty(apkVersion.updateTime())) {
+                sb.append("更新时间：").append(apkVersion.updateTime());
+            }
+            String version = sb.toString();
+            tvVersion.setVisibility(version.isEmpty() ? View.GONE : View.VISIBLE);
+            tvVersion.setText(version);
             //
             tvUpdateDescTitle.setVisibility(View.VISIBLE);
             tvUpdateDesc.setText(apkVersion.updateDesc());
@@ -154,7 +163,7 @@ public class UpdateFragment extends DialogFragment {
 
 
     /*点击下载*/
-    private View.OnClickListener clkDownload = new View.OnClickListener() {
+    private final View.OnClickListener clkDownload = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             if (null != updateHandle) {
@@ -184,7 +193,7 @@ public class UpdateFragment extends DialogFragment {
     }
 
     /*点击取消*/
-    private View.OnClickListener clkCancel = new View.OnClickListener() {
+    private final View.OnClickListener clkCancel = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
             if (null != updateHandle) {
@@ -204,7 +213,7 @@ public class UpdateFragment extends DialogFragment {
         }
     }
 
-    private DownloadListener downloadListener = new DownloadListener() {
+    private final DownloadListener downloadListener = new DownloadListener() {
         @Override
         public void onStart() {
             setDownloadProgress(0);
@@ -213,7 +222,7 @@ public class UpdateFragment extends DialogFragment {
 
         @Override
         public void onProgress(int current, int total) {
-            int progress = (int) (current / (total / 1.0) * 100);
+            int progress = (int) (current / total * 100);
             setDownloadProgress(progress);
         }
 
