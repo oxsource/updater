@@ -30,6 +30,7 @@ import oxsource.android.updater.view.UpdateNotification;
  */
 
 public final class UpdateController implements Handler.Callback {
+    private static final String TAG = "Update.Controller";
     private static String FILE_PROVIDER_AUTHORITIES = "";
     //整型常量
     private final int WHAT_VERIFY_START = 10;
@@ -56,6 +57,8 @@ public final class UpdateController implements Handler.Callback {
     private UpdateValidator validator;
     private DownloadListener dListener;
     private UpdateNotification notification;
+    //
+    private volatile boolean cancel = false;
 
     public static void authority(String authorities) {
         FILE_PROVIDER_AUTHORITIES = authorities;
@@ -85,6 +88,7 @@ public final class UpdateController implements Handler.Callback {
         HttpURLConnection conn = null;
         BufferedInputStream bis = null;
         try {
+            cancel = false;
             notifyHandler(WHAT_VERIFY_START, null);
             //配置远程连接
             URL url = new URL(verifyUrl);
@@ -93,20 +97,24 @@ public final class UpdateController implements Handler.Callback {
             conn.setConnectTimeout(TIME_OUT_MS);
             conn.setRequestProperty(KEY_CHARSET, CHARSET_DEFAULT);
             conn.connect();
+            Log.d(TAG, "verify connected.");
             //读取远程数据并写入ByteArrayOutputStream
             bis = new BufferedInputStream(conn.getInputStream());
             byte[] buffer = new byte[1024];
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int len;
             while ((len = bis.read(buffer)) != -1) {
+                if (cancel) throw new Exception("user cancel");
                 bos.write(buffer, 0, len);
             }
             bos.flush();
             bos.reset();
-            UpdateVersion value = validator.onVerify(bos.toString(CHARSET_DEFAULT));
+            String json = bos.toString(CHARSET_DEFAULT);
+            Log.d(TAG, "verify result: " + json);
+            UpdateVersion value = validator.onVerify(json);
             notifyHandler(WHAT_VERIFY_SUCCESS, value);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "verify panic", e);
             notifyHandler(WHAT_VERIFY_FAILURE, ERROR_DEFAULT_VALIDATE);
         } finally {
             quitHttp(conn);
@@ -119,6 +127,7 @@ public final class UpdateController implements Handler.Callback {
         BufferedInputStream bis = null;
         FileOutputStream fos = null;
         try {
+            cancel = false;
             notifyHandler(WHAT_DOWNLOAD_START, null);
             //配置本地下载路径
             String state = Environment.getExternalStorageState();
@@ -130,12 +139,9 @@ public final class UpdateController implements Handler.Callback {
             }
             File dPath = new File(Environment.getExternalStorageDirectory(), DOWNLOAD_PATH_DEFAULT);
             File apkFile = new File(dPath, apkPath);
-            if (!apkFile.getParentFile().exists()) {
-                if (!apkFile.getParentFile().mkdirs()) {
-                    int a = 1;
-                    System.out.print(a);
-                    Log.d("", "mkdirs return failure");
-                }
+            File parent = apkFile.getParentFile();
+            if (!parent.exists() && parent.mkdirs()) {
+                throw new Exception("mkdirs failed.");
             }
             fos = new FileOutputStream(apkFile);
             //配置远程连接
@@ -146,36 +152,44 @@ public final class UpdateController implements Handler.Callback {
             conn.setRequestProperty(KEY_CHARSET, CHARSET_DEFAULT);
             conn.connect();
             //读取
+            Log.d(TAG, "download connected.");
             bis = new BufferedInputStream(conn.getInputStream());
             byte[] buffer = new byte[10 * 1024];
             final int[] POSITIONS = new int[]{conn.getContentLength(), 0};
             int len;
             long lastReadMs = 0;
             while ((len = bis.read(buffer)) != -1) {
+                if (cancel) throw new Exception("user cancel");
                 fos.write(buffer, 0, len);
                 POSITIONS[1] += len;
                 long nowReadMs = System.currentTimeMillis();
                 int TIME_INTERVAL_MS = 500;
                 if ((nowReadMs - lastReadMs) >= TIME_INTERVAL_MS) {
+                    Log.d(TAG, "download progress: " + POSITIONS[1] + "/" + POSITIONS[0]);
                     notifyHandler(WHAT_DOWNLOAD_PROGRESS, POSITIONS);
                     lastReadMs = nowReadMs;
                 }
             }
             notifyHandler(WHAT_DOWNLOAD_SUCCESS, apkFile.getAbsolutePath());
+            Log.d(TAG, "download finish");
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.d(TAG, "download panic", e);
             notifyHandler(WHAT_DOWNLOAD_FAILURE, ERROR_DEFAULT_DOWNLOAD);
         } finally {
             quitHttp(conn);
             quitClose(bis);
             quitClose(fos);
         }
+    }
 
+    public void cancel() {
+        cancel = true;
     }
 
     public void install(Application context, String path) {
         notification(null);
         try {
+            Log.d(TAG, "invoke install: " + path);
             Intent intent = new Intent(Intent.ACTION_VIEW);
             File file = new File(path);
             Uri uri;
@@ -190,7 +204,7 @@ public final class UpdateController implements Handler.Callback {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TAG, "install panic", e);
         }
     }
 

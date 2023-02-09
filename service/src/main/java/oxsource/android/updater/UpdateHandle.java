@@ -3,6 +3,7 @@ package oxsource.android.updater;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+
 import androidx.annotation.NonNull;
 
 import java.util.HashMap;
@@ -75,6 +76,7 @@ public class UpdateHandle {
      * 销毁句柄
      */
     public void destroy() {
+        controller.cancel();
         controller.validator(null);
         controller.downloadListener(null);
         controller.notification(null);

@@ -3,10 +3,11 @@ package oxsource.android.updater;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
-import androidx.annotation.Nullable;
 import android.util.Log;
 
-import java.util.concurrent.Executor;
+import androidx.annotation.Nullable;
+
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import oxsource.android.updater.arch.UpdateController;
@@ -21,16 +22,16 @@ import oxsource.android.updater.view.UpdateNotification;
  */
 
 public final class UpdateService extends Service {
-    private final static String TAG = UpdateService.class.getSimpleName();
+    private final static String TAG = "Update.Service";
 
-    private final Executor threadPool = Executors.newCachedThreadPool();
+    private final ExecutorService threadPool = Executors.newScheduledThreadPool(1);
     private UpdateNotification notification;
 
     @Override
     public void onCreate() {
         super.onCreate();
         notification = new UpdateNotification(getApplicationContext());
-        log("UpdateService onCreate");
+        log("onCreate");
     }
 
     @Override
@@ -44,20 +45,20 @@ public final class UpdateService extends Service {
         UpdateController controller = UpdateHandle.obtain(tag);
         switch (what) {
             case UpdateHandle.WHAT_VERIFY:
-                log("UpdateService WHAT_VERIFY");
+                log("WHAT_VERIFY");
                 String verifyUrl = intent.getStringExtra(UpdateHandle.KEY_URL);
                 controller.notification(notification);
                 threadPool.execute(new VerifyRunnable(controller, verifyUrl));
                 break;
             case UpdateHandle.WHAT_DOWNLOAD:
-                log("UpdateService WHAT_DOWNLOAD");
+                log("WHAT_DOWNLOAD");
                 String apkUrl = intent.getStringExtra(UpdateHandle.KEY_URL);
                 String apkPah = intent.getStringExtra(UpdateHandle.KEY_PATH);
                 controller.notification(notification);
                 threadPool.execute(new DownloadRunnable(controller, apkPah, apkUrl));
                 break;
             case UpdateHandle.WHAT_INSTALL:
-                log("UpdateService WHAT_INSTALL");
+                log("WHAT_INSTALL");
                 String apkPath = intent.getStringExtra(UpdateHandle.KEY_PATH);
                 controller.notification(notification);
                 controller.install(getApplication(), apkPath);
@@ -70,7 +71,7 @@ public final class UpdateService extends Service {
 
     @Override
     public void onDestroy() {
-        log("UpdateService onDestroy");
+        log("onDestroy");
         super.onDestroy();
     }
 
