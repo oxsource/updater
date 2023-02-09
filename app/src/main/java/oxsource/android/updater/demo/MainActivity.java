@@ -38,7 +38,6 @@ public class MainActivity extends FragmentActivity {
         UpdateController.authority(getPackageName() + ".fileProvider");
     }
 
-
     private final View.OnClickListener cklVerify = new View.OnClickListener() {
         @Override
         public void onClick(View view) {

@@ -206,6 +206,12 @@ public class UpdateFragment extends DialogFragment {
                 updateHandle = null;
             }
             dismiss();
+            if (null != version && version.force()) {
+                Activity activity = getActivity();
+                if (null == activity) return;
+                if (activity.isFinishing() || activity.isDestroyed()) return;
+                activity.finish();
+            }
         }
     };
 

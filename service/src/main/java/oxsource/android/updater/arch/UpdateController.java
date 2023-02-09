@@ -155,25 +155,23 @@ public final class UpdateController implements Handler.Callback {
             Log.d(TAG, "download connected.");
             bis = new BufferedInputStream(conn.getInputStream());
             byte[] buffer = new byte[10 * 1024];
-            final int[] POSITIONS = new int[]{conn.getContentLength(), 0};
-            int len;
-            long lastReadMs = 0;
+            final int[] progress = new int[]{conn.getContentLength(), 0};
+            int len, percent = 0, previous = 0;
             while ((len = bis.read(buffer)) != -1) {
                 if (cancel) throw new Exception("user cancel");
                 fos.write(buffer, 0, len);
-                POSITIONS[1] += len;
-                long nowReadMs = System.currentTimeMillis();
-                int TIME_INTERVAL_MS = 500;
-                if ((nowReadMs - lastReadMs) >= TIME_INTERVAL_MS) {
-                    Log.d(TAG, "download progress: " + POSITIONS[1] + "/" + POSITIONS[0]);
-                    notifyHandler(WHAT_DOWNLOAD_PROGRESS, POSITIONS);
-                    lastReadMs = nowReadMs;
+                progress[1] += len;
+                percent = (int) (progress[1] * 100.0f / progress[0]);
+                if (percent > previous) {
+                    previous = percent;
+                    Log.d(TAG, "download progress(" + percent + "%): " + progress[1] + "/" + progress[0]);
+                    notifyHandler(WHAT_DOWNLOAD_PROGRESS, progress);
                 }
             }
             notifyHandler(WHAT_DOWNLOAD_SUCCESS, apkFile.getAbsolutePath());
             Log.d(TAG, "download finish");
         } catch (Exception e) {
-            Log.d(TAG, "download panic", e);
+            Log.e(TAG, "download panic", e);
             notifyHandler(WHAT_DOWNLOAD_FAILURE, ERROR_DEFAULT_DOWNLOAD);
         } finally {
             quitHttp(conn);
